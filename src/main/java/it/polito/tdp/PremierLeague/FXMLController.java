@@ -8,6 +8,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.PremierLeague.model.Adiacenza;
+import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -39,29 +42,65 @@ public class FXMLController {
     private TextField txtMinuti; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbMese"
-    private ComboBox<?> cmbMese; // Value injected by FXMLLoader
+    private ComboBox<Integer> cmbMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbM1"
-    private ComboBox<?> cmbM1; // Value injected by FXMLLoader
+    private ComboBox<Match> cmbM1; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbM2"
-    private ComboBox<?> cmbM2; // Value injected by FXMLLoader
+    private ComboBox<Match> cmbM2; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
 
     @FXML
     void doConnessioneMassima(ActionEvent event) {
+    
+    	List<Adiacenza> lista=new ArrayList<Adiacenza>(this.model.getBest());
+    	for(Adiacenza a:lista)
+    	{
+    		txtResult.appendText(a.toString()+"\n");
+    	}
     	
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	this.txtResult.clear();
+    	String minS=this.txtMinuti.getText();
+    	Integer mese=this.cmbMese.getValue();
+    	Integer min=0;
+    	try {
+    		min=Integer.parseInt(minS);
+    	}catch(NumberFormatException e)
+    	{
+    		e.printStackTrace();
+    	}
+    	this.model.creaGrafo(mese, min);
+    	this.txtResult.appendText("GRAFO CREATO!\n");
+    	this.txtResult.appendText("numero archi: "+this.model.getNArchi()+"\n");
+    	this.txtResult.appendText("numero Vertici: "+this.model.getNVertici()+"\n");
+    	this.cmbM1.getItems().addAll(this.model.getMatches());
+    	this.cmbM2.getItems().addAll(this.model.getMatches());
     	
     }
 
     @FXML
     void doCollegamento(ActionEvent event) {
+    	Match m1=this.cmbM1.getValue();
+    	Match m2=this.cmbM2.getValue();
+    	if(m1.getMatchID().equals(m2.getMatchID()))
+    	{
+    		txtResult.setText("NON SI POSSONO SELEZIONARE LE STESSE PARTITE");
+    		return;
+    	}
+    	List <Match> list=this.model.lista(m1, m2);
+    	txtResult.appendText("il cammino di peso massimo è:\n");
+    	for(Match m:list)
+    	{
+    		txtResult.appendText(m.toString()+"\n");
+    	}
+    	txtResult.appendText("di peso "+this.model.getPesoCamminoMax());
     	
     }
 
@@ -79,7 +118,12 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
-  
+    	List<Integer> mesi=new ArrayList<Integer>();
+    	for(int i=1;i<=12;i++)
+    	{
+    		mesi.add(i);
+    	}
+    	this.cmbMese.getItems().addAll(mesi);
     }
     
     
