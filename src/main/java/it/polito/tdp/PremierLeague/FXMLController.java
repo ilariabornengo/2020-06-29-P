@@ -55,20 +55,7 @@ public class FXMLController {
 
     @FXML
     void doConnessioneMassima(ActionEvent event) {
-    
-    	List<Adiacenza> lista=new ArrayList<Adiacenza>(this.model.getBest());
-    	for(Adiacenza a:lista)
-    	{
-    		txtResult.appendText(a.toString()+"\n");
-    	}
-    	
-    }
-
-    @FXML
-    void doCreaGrafo(ActionEvent event) {
-    	this.txtResult.clear();
     	String minS=this.txtMinuti.getText();
-    	Integer mese=this.cmbMese.getValue();
     	Integer min=0;
     	try {
     		min=Integer.parseInt(minS);
@@ -76,32 +63,55 @@ public class FXMLController {
     	{
     		e.printStackTrace();
     	}
+    	Integer mese=this.cmbMese.getValue();
+    	this.txtResult.appendText("LE PARTITE MIGLIORI SONO:\n");
+    	List<Adiacenza> listaOK=this.model.getMigliori(mese, min);
+    	for(Adiacenza a:listaOK)
+    	{
+    		txtResult.appendText(a.toString()+"\n");
+    	}
+    }
+
+    @FXML
+    void doCreaGrafo(ActionEvent event) {
+    
+    	this.txtResult.clear();
+    	String minS=this.txtMinuti.getText();
+    	Integer min=0;
+    	try {
+    		min=Integer.parseInt(minS);
+    	}catch(NumberFormatException e)
+    	{
+    		e.printStackTrace();
+    	}
+    	Integer mese=this.cmbMese.getValue();
     	this.model.creaGrafo(mese, min);
-    	this.txtResult.appendText("GRAFO CREATO!\n");
-    	this.txtResult.appendText("numero archi: "+this.model.getNArchi()+"\n");
-    	this.txtResult.appendText("numero Vertici: "+this.model.getNVertici()+"\n");
-    	this.cmbM1.getItems().addAll(this.model.getMatches());
-    	this.cmbM2.getItems().addAll(this.model.getMatches());
-    	
+    	this.txtResult.appendText("GRAFO CREATO!!!\n");
+    	this.txtResult.appendText("# archi: "+this.model.getArchi()+"\n");
+    	this.txtResult.appendText("# vertici: "+this.model.getVertici()+"\n");
+    	this.cmbM1.getItems().addAll(this.model.getListVertici());
+    	this.cmbM2.getItems().addAll(this.model.getListVertici());
     }
 
     @FXML
     void doCollegamento(ActionEvent event) {
+    	txtResult.clear();
     	Match m1=this.cmbM1.getValue();
     	Match m2=this.cmbM2.getValue();
     	if(m1.getMatchID().equals(m2.getMatchID()))
     	{
-    		txtResult.setText("NON SI POSSONO SELEZIONARE LE STESSE PARTITE");
+    		txtResult.appendText("NON SI PU0' SCEGLIERE LA STESSA SQUADRA!!");
     		return;
     	}
-    	List <Match> list=this.model.lista(m1, m2);
-    	txtResult.appendText("il cammino di peso massimo è:\n");
-    	for(Match m:list)
+    	else
     	{
-    		txtResult.appendText(m.toString()+"\n");
+    		List<Match> best= new ArrayList<Match>(this.model.listaBest(m1, m2));
+    		
+    		for(Match ma:best)
+    		{System.out.println(ma.toString()+"\n");
+    			this.txtResult.appendText(ma.toString()+"\n");
+    		}
     	}
-    	txtResult.appendText("di peso "+this.model.getPesoCamminoMax());
-    	
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -117,13 +127,13 @@ public class FXMLController {
     }
     
     public void setModel(Model model) {
-    	this.model = model;
-    	List<Integer> mesi=new ArrayList<Integer>();
-    	for(int i=1;i<=12;i++)
-    	{
-    		mesi.add(i);
-    	}
-    	this.cmbMese.getItems().addAll(mesi);
+    this.model=model;
+    List<Integer> mese=new ArrayList<Integer>();
+    for(int i=1;i<=12; i++)
+    {
+    	mese.add(i);
+    }
+    this.cmbMese.getItems().addAll(mese);
     }
     
     

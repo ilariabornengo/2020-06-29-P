@@ -1,10 +1,11 @@
 package it.polito.tdp.PremierLeague.model;
 
 public class Adiacenza {
+
 	Match m1;
 	Match m2;
-	Double peso;
-	public Adiacenza(Match m1, Match m2, Double peso) {
+	Integer peso;
+	public Adiacenza(Match m1, Match m2, Integer peso) {
 		super();
 		this.m1 = m1;
 		this.m2 = m2;
@@ -22,16 +23,16 @@ public class Adiacenza {
 	public void setM2(Match m2) {
 		this.m2 = m2;
 	}
-	public Double getPeso() {
+	public Integer getPeso() {
 		return peso;
 	}
-	public void setPeso(Double peso) {
+	public void setPeso(Integer peso) {
 		this.peso = peso;
 	}
 	@Override
 	public String toString() {
-		return m1.getMatchID()+"( "+m1.getTeamHomeNAME()+" vs "+m1.teamAwayNAME+" )"+" - "+m2.getMatchID()+"("+m2.getTeamHomeNAME()+" vs "+m2.getTeamAwayNAME()+")"+" - "+peso;
+		return m1.toString()+" - "+m2.toString()+" - "+this.peso;
 	}
 	
-
+	
 }

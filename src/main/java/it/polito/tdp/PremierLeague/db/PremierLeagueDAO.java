@@ -93,70 +93,40 @@ public class PremierLeagueDAO {
 			e.printStackTrace();
 		}
 	}
-	public List<Adiacenza> getAdiacenze(Map<Integer,Match> idMap,Integer tempo,Integer mese){
-		String sql = "SELECT a1.MatchID AS m1, a2.MatchID AS m2, COUNT(a1.PlayerID) AS peso "
-				+ "FROM actions a1,actions a2,matches m1,matches m2 "
-				+ "WHERE a1.PlayerID=a2.PlayerID "
-				+ "AND a1.MatchID> a2.MatchID "
+	
+	public List<Adiacenza> listAdiacenze(Map<Integer,Match> idMap, Integer mese,Integer min){
+		String sql = "SELECT a1.MatchID AS id1, a2.MatchID AS id2, COUNT(a1.PlayerID) AS peso "
+				+ "FROM actions a1, actions a2, matches m1, matches m2 "
+				+ "WHERE a1.MatchID> a2.MatchID "
+				+ "AND a1.PlayerID=a2.PlayerID "
 				+ "AND a1.MatchID=m1.MatchID "
 				+ "AND a2.MatchID=m2.MatchID "
 				+ "AND MONTH(m1.Date)=MONTH(m2.Date) "
 				+ "AND MONTH(m1.Date)=? "
 				+ "AND a1.TimePlayed>=? "
 				+ "AND a2.TimePlayed>=? "
-				+ "GROUP BY a1.MatchID,a2.MatchID " ;
+				+ "GROUP BY a1.MatchID, a2.MatchID " ;
 		List<Adiacenza> result = new ArrayList<Adiacenza>();
 		Connection conn = DBConnect.getConnection();
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
 			st.setInt(1, mese);
-			st.setInt(2, tempo);
-			st.setInt(3, tempo);
+			st.setInt(2, min);
+			st.setInt(3, min);
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
-
-				if(idMap.containsKey(res.getInt("m1"))&& idMap.containsKey(res.getInt("m2")))
+				if(idMap.containsKey(res.getInt("id1")) && idMap.containsKey(res.getInt("id2")))
 				{
-					Adiacenza a=new Adiacenza(idMap.get(res.getInt("m1")),idMap.get(res.getInt("m2")),res.getDouble("peso"));
+					Adiacenza a=new Adiacenza(idMap.get(res.getInt("id1")), idMap.get(res.getInt("id2")),res.getInt("peso"));
 					result.add(a);
 				}
-				
 			}
 			conn.close();
 			return result;
-			
-		} catch (SQLException e) {
+			} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-	public int getPeso(Match m1,Match m2){
-		String sql = "SELECT COUNT(a1.PlayerID) AS peso "
-				+ "FROM actions a1,actions a2,matches m1,matches m2 "
-				+ "WHERE a1.PlayerID=a2.PlayerID "
-				+ "AND a1.MatchID=? "
-				+ "AND a2.MatchID? " ;
-		List<Adiacenza> result = new ArrayList<Adiacenza>();
-		Connection conn = DBConnect.getConnection();
-
-		try {
-			PreparedStatement st = conn.prepareStatement(sql);
-			st.setInt(1, m1.getMatchID());
-			st.setInt(2, m2.getMatchID());
-			ResultSet res = st.executeQuery();
-			int peso=0;
-			while (res.next()) {
-
-				peso= res.getInt("peso");
-			}
-			conn.close();
-			return peso;
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		return 0;
-		}
-	}
-	
 }
