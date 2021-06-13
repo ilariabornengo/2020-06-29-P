@@ -55,62 +55,57 @@ public class FXMLController {
 
     @FXML
     void doConnessioneMassima(ActionEvent event) {
+
+    	txtResult.clear();
     	String minS=this.txtMinuti.getText();
     	Integer min=0;
+    	Integer mese=this.cmbMese.getValue();
     	try {
     		min=Integer.parseInt(minS);
     	}catch(NumberFormatException e)
     	{
     		e.printStackTrace();
     	}
-    	Integer mese=this.cmbMese.getValue();
-    	this.txtResult.appendText("LE PARTITE MIGLIORI SONO:\n");
-    	List<Adiacenza> listaOK=this.model.getMigliori(mese, min);
-    	for(Adiacenza a:listaOK)
+    	List<Adiacenza> best=this.model.getMigliori(mese, min);
+    	for(Adiacenza a:best)
     	{
     		txtResult.appendText(a.toString()+"\n");
     	}
+    	
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
     
-    	this.txtResult.clear();
+    	txtResult.clear();
     	String minS=this.txtMinuti.getText();
     	Integer min=0;
+    	Integer mese=this.cmbMese.getValue();
     	try {
     		min=Integer.parseInt(minS);
     	}catch(NumberFormatException e)
     	{
     		e.printStackTrace();
     	}
-    	Integer mese=this.cmbMese.getValue();
     	this.model.creaGrafo(mese, min);
-    	this.txtResult.appendText("GRAFO CREATO!!!\n");
-    	this.txtResult.appendText("# archi: "+this.model.getArchi()+"\n");
+    	this.txtResult.appendText("GRAFO CREATO!!\n");
+    	this.txtResult.appendText("# ARCHI: "+this.model.getArchi()+"\n");
     	this.txtResult.appendText("# vertici: "+this.model.getVertici()+"\n");
-    	this.cmbM1.getItems().addAll(this.model.getListVertici());
-    	this.cmbM2.getItems().addAll(this.model.getListVertici());
+    	
+    	this.cmbM1.getItems().addAll(this.model.verticiGrafo());
+    	this.cmbM2.getItems().addAll(this.model.verticiGrafo());
+    	
     }
 
     @FXML
     void doCollegamento(ActionEvent event) {
-    	txtResult.clear();
-    	Match m1=this.cmbM1.getValue();
-    	Match m2=this.cmbM2.getValue();
-    	if(m1.getMatchID().equals(m2.getMatchID()))
+    	Match partenza=this.cmbM1.getValue();
+    	Match arrivo=this.cmbM2.getValue();
+    	List<Match> best=new ArrayList<Match>(this.model.best(partenza, arrivo));
+    	txtResult.appendText("IL PERCORSO MIGLIORE TRA M1 E M2 E':\n");
+    	for(Match m:best)
     	{
-    		txtResult.appendText("NON SI PU0' SCEGLIERE LA STESSA SQUADRA!!");
-    		return;
-    	}
-    	else
-    	{
-    		List<Match> best= new ArrayList<Match>(this.model.listaBest(m1, m2));
-    		
-    		for(Match ma:best)
-    		{System.out.println(ma.toString()+"\n");
-    			this.txtResult.appendText(ma.toString()+"\n");
-    		}
+    		txtResult.appendText(m.toString()+"\n");
     	}
     }
 
@@ -128,12 +123,12 @@ public class FXMLController {
     
     public void setModel(Model model) {
     this.model=model;
-    List<Integer> mese=new ArrayList<Integer>();
-    for(int i=1;i<=12; i++)
+    List<Integer> mesi=new ArrayList<Integer>();
+    for(int i=1;i<=12;i++)
     {
-    	mese.add(i);
+    	mesi.add(i);
     }
-    this.cmbMese.getItems().addAll(mese);
+    this.cmbMese.getItems().addAll(mesi);
     }
     
     

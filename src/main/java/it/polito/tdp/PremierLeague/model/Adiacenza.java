@@ -31,7 +31,7 @@ public class Adiacenza {
 	}
 	@Override
 	public String toString() {
-		return m1.toString()+" - "+m2.toString()+" - "+this.peso;
+		return m1+" vs "+m2+" ( "+peso+" )";
 	}
 	
 	
