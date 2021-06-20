@@ -66,10 +66,12 @@ public class FXMLController {
     	{
     		e.printStackTrace();
     	}
-    	List<Adiacenza> best=this.model.getMigliori(mese, min);
-    	for(Adiacenza a:best)
+    	
+    	List<Adiacenza> lista=this.model.migliori(mese, min);
+    
+    	for(Adiacenza a:lista)
     	{
-    		txtResult.appendText(a.toString()+"\n");
+    	txtResult.appendText(a.toString()+"\n");
     	}
     	
     }
@@ -88,24 +90,30 @@ public class FXMLController {
     		e.printStackTrace();
     	}
     	this.model.creaGrafo(mese, min);
-    	this.txtResult.appendText("GRAFO CREATO!!\n");
-    	this.txtResult.appendText("# ARCHI: "+this.model.getArchi()+"\n");
+    	this.txtResult.appendText("GRAFO CREATO!\n");
     	this.txtResult.appendText("# vertici: "+this.model.getVertici()+"\n");
-    	
-    	this.cmbM1.getItems().addAll(this.model.verticiGrafo());
-    	this.cmbM2.getItems().addAll(this.model.verticiGrafo());
-    	
+    	this.txtResult.appendText("# archi: "+this.model.getArchi()+"\n");
+    	this.cmbM1.getItems().addAll(this.model.vertici());
+    	this.cmbM2.getItems().addAll(this.model.vertici());
     }
 
     @FXML
     void doCollegamento(ActionEvent event) {
+    	txtResult.clear();
     	Match partenza=this.cmbM1.getValue();
     	Match arrivo=this.cmbM2.getValue();
-    	List<Match> best=new ArrayList<Match>(this.model.best(partenza, arrivo));
-    	txtResult.appendText("IL PERCORSO MIGLIORE TRA M1 E M2 E':\n");
+    	if(arrivo.equals(partenza))
+    	{
+    		txtResult.appendText("SONO GLI STESSI MATCH!\n");
+    	}
+    	else
+    	{
+    	List<Match> best=new ArrayList<Match>(this.model.getBest(partenza, arrivo));
+    	this.txtResult.appendText("IL GRAFO DI LUNGHEZZA MASSIMA VALE: "+this.model.massimo+" ED E' COMPOSTO DA:\n");
     	for(Match m:best)
     	{
-    		txtResult.appendText(m.toString()+"\n");
+    		this.txtResult.appendText(m.toString()+"\n");
+    	}
     	}
     }
 

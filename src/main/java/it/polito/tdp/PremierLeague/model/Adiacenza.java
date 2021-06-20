@@ -31,7 +31,7 @@ public class Adiacenza {
 	}
 	@Override
 	public String toString() {
-		return m1+" vs "+m2+" ( "+peso+" )";
+		return m1.teamHomeNAME+" - "+m1.teamAwayNAME+" vs "+m2.teamHomeNAME+" - "+m2.teamAwayNAME+" ( "+peso+" )";
 	}
 	
 	

@@ -63,42 +63,15 @@ public class PremierLeagueDAO {
 		}
 	}
 	
-	public List<Match> listAllMatches(){
-		String sql = "SELECT m.MatchID, m.TeamHomeID, m.TeamAwayID, m.teamHomeFormation, m.teamAwayFormation, m.resultOfTeamHome, m.date, t1.Name, t2.Name   "
-				+ "FROM Matches m, Teams t1, Teams t2 "
-				+ "WHERE m.TeamHomeID = t1.TeamID AND m.TeamAwayID = t2.TeamID";
-		List<Match> result = new ArrayList<Match>();
-		Connection conn = DBConnect.getConnection();
 
-		try {
-			PreparedStatement st = conn.prepareStatement(sql);
-			ResultSet res = st.executeQuery();
-			while (res.next()) {
-
-				
-				Match match = new Match(res.getInt("m.MatchID"), res.getInt("m.TeamHomeID"), res.getInt("m.TeamAwayID"), res.getInt("m.teamHomeFormation"), 
-							res.getInt("m.teamAwayFormation"),res.getInt("m.resultOfTeamHome"), res.getTimestamp("m.date").toLocalDateTime(), res.getString("t1.Name"),res.getString("t2.Name"));
-				
-				
-				result.add(match);
-
-			}
-			conn.close();
-			return result;
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
 	
-	public void getVertici(Map<Integer,Match> idMap,Integer mese){
-		String sql = "SELECT m.*, t1.Name AS nomeH, t2.Name AS nomeA "
-				+ "FROM matches m,teams t1,teams t2 "
-				+ "WHERE m.TeamHomeID=t1.TeamID "
-				+ "AND m.TeamAwayID=t2.TeamID "
-				+ "AND month(m.Date)=? " ;
-		List<Action> result = new ArrayList<Action>();
+	public void getVertcici(Map<Integer,Match> idMap, int mese){
+		String sql = "SELECT m.MatchID AS id, m.TeamHomeID AS homeID, m.TeamAwayID AS awayID, m.TeamHomeFormation AS fH, m.TeamAwayFormation AS fA, m.ResultOfTeamHome AS res, m.Date AS data, t1.Name AS nomeH, t2.Name AS nomeA "
+				+ "FROM matches m, teams t1, teams t2 "
+				+ "WHERE month(m.Date)=? "
+				+ "AND m.TeamHomeID=t1.TeamID "
+				+ "AND m.TeamAwayID=t2.TeamID " ;
+		
 		Connection conn = DBConnect.getConnection();
 
 		try {
@@ -106,40 +79,41 @@ public class PremierLeagueDAO {
 			st.setInt(1, mese);
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
-				if(!idMap.containsKey(res.getInt("MatchID")))
-				{
-					Match match = new Match(res.getInt("m.MatchID"), res.getInt("m.TeamHomeID"), res.getInt("m.TeamAwayID"), res.getInt("m.teamHomeFormation"), 
-							res.getInt("m.teamAwayFormation"),res.getInt("m.resultOfTeamHome"), res.getTimestamp("m.date").toLocalDateTime(), res.getString("nomeH"),res.getString("nomeA"));
-					idMap.put(match.getMatchID(), match);
+			if(!idMap.containsKey(res.getInt("id")))
+			{
 				
-				}
+				Match match = new Match(res.getInt("id"), res.getInt("homeID"), res.getInt("awayID"), res.getInt("fH"), 
+							res.getInt("fA"),res.getInt("res"), res.getTimestamp("data").toLocalDateTime(), res.getString("nomeH"),res.getString("nomeA"));
 				
+				idMap.put(match.getMatchID(), match);
 			}
+			
 			conn.close();
 			
-			
-		} catch (SQLException e) {
+			}} catch (SQLException e) {
 			e.printStackTrace();
 	
-		}
+			
 	}
+}
 	
-	public List<Adiacenza> getAdiacenze(Map<Integer,Match> idMap,Integer anno,Integer min){
-		String sql = "SELECT a1.MatchID AS id1, a2.MatchID AS id2, COUNT(a1.PlayerID) AS peso "
-				+ "FROM actions a1,actions a2,matches m1,matches m2 "
-				+ "WHERE a1.PlayerID=a2.PlayerID "
-				+ "AND m1.MatchID=a1.MatchID AND m2.MatchID=a2.MatchID "
+	public List<Adiacenza> getAdiacenze(Map<Integer,Match> idMap, Integer mese, Integer min){
+		String sql = "SELECT a1.MatchID AS id1, a2.MatchID AS id2, COUNT( distinct a1.PlayerID) AS peso "
+				+ "FROM matches m1, matches m2, actions a1,actions a2 "
+				+ "WHERE m1.MatchID=a1.MatchID AND m2.MatchID=a2.MatchID "
+				+ "AND month(m1.Date)=MONTH(m2.Date) "
+				+ "AND month(m1.Date)=? "
+				+ "AND a1.PlayerID=a2.PlayerID "
 				+ "AND a1.MatchID> a2.MatchID "
-				+ "AND MONTH(m1.Date)=MONTH(m2.Date) "
-				+ "AND MONTH(m1.Date)=? "
 				+ "AND a1.TimePlayed>=? AND a2.TimePlayed>=? "
-				+ "GROUP BY a1.MatchID,a2.MatchID " ;
+				+ "GROUP BY a1.MatchID, a2.MatchID "
+				+ "";
 		List<Adiacenza> result = new ArrayList<Adiacenza>();
 		Connection conn = DBConnect.getConnection();
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
-			st.setInt(1, anno);
+			st.setInt(1, mese);
 			st.setInt(2, min);
 			st.setInt(3, min);
 			ResultSet res = st.executeQuery();
@@ -150,7 +124,6 @@ public class PremierLeagueDAO {
 					result.add(a);
 				}
 				
-
 			}
 			conn.close();
 			return result;
@@ -161,3 +134,4 @@ public class PremierLeagueDAO {
 		}
 	}
 }
+		
