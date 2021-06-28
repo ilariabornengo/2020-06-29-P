@@ -1,7 +1,7 @@
 package it.polito.tdp.PremierLeague.model;
 
 public class Adiacenza {
-
+	
 	Match m1;
 	Match m2;
 	Integer peso;
@@ -31,8 +31,9 @@ public class Adiacenza {
 	}
 	@Override
 	public String toString() {
-		return m1.teamHomeNAME+" - "+m1.teamAwayNAME+" vs "+m2.teamHomeNAME+" - "+m2.teamAwayNAME+" ( "+peso+" )";
+		return m1+" - "+m2+" - ("+peso+")";
 	}
 	
 	
+
 }

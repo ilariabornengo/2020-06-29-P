@@ -57,21 +57,26 @@ public class FXMLController {
     void doConnessioneMassima(ActionEvent event) {
 
     	txtResult.clear();
+    	
     	String minS=this.txtMinuti.getText();
     	Integer min=0;
-    	Integer mese=this.cmbMese.getValue();
     	try {
     		min=Integer.parseInt(minS);
     	}catch(NumberFormatException e)
     	{
     		e.printStackTrace();
     	}
-    	
-    	List<Adiacenza> lista=this.model.migliori(mese, min);
-    
-    	for(Adiacenza a:lista)
+    	Integer mese=this.cmbMese.getValue();
+    	if(mese==null)
     	{
-    	txtResult.appendText(a.toString()+"\n");
+    		txtResult.appendText("MESE NON INSERITO");
+    	}else
+    	{
+    		List<Adiacenza> OK=new ArrayList<Adiacenza>(this.model.migliori(mese, min));
+    		for(Adiacenza a:OK)
+    		{
+    			txtResult.appendText(a.toString()+"\n");
+    		}
     	}
     	
     }
@@ -82,38 +87,47 @@ public class FXMLController {
     	txtResult.clear();
     	String minS=this.txtMinuti.getText();
     	Integer min=0;
-    	Integer mese=this.cmbMese.getValue();
     	try {
     		min=Integer.parseInt(minS);
     	}catch(NumberFormatException e)
     	{
     		e.printStackTrace();
     	}
-    	this.model.creaGrafo(mese, min);
-    	this.txtResult.appendText("GRAFO CREATO!\n");
-    	this.txtResult.appendText("# vertici: "+this.model.getVertici()+"\n");
-    	this.txtResult.appendText("# archi: "+this.model.getArchi()+"\n");
-    	this.cmbM1.getItems().addAll(this.model.vertici());
-    	this.cmbM2.getItems().addAll(this.model.vertici());
+    	Integer mese=this.cmbMese.getValue();
+    	if(mese==null)
+    	{
+    		txtResult.appendText("MESE NON INSERITO");
+    	}else
+    	{
+    		this.model.creaGrafo(mese, min);
+    		txtResult.appendText("GRAFO CREATO!\n");
+    		txtResult.appendText("# vertici : "+this.model.getVertici()+"\n");
+    		txtResult.appendText("# archi : "+this.model.getArchi()+"\n");
+    	}
+    	
+    	this.cmbM1.getItems().addAll(this.model.getPartite());
+    	this.cmbM2.getItems().addAll(this.model.getPartite());
     }
 
     @FXML
     void doCollegamento(ActionEvent event) {
     	txtResult.clear();
-    	Match partenza=this.cmbM1.getValue();
-    	Match arrivo=this.cmbM2.getValue();
-    	if(arrivo.equals(partenza))
+    	Match m1=this.cmbM1.getValue();
+    	Match m2=this.cmbM2.getValue();
+    	if(m1==null || m2==null)
     	{
-    		txtResult.appendText("SONO GLI STESSI MATCH!\n");
-    	}
-    	else
+    		txtResult.appendText("compilare tutti i campi!\n");
+    	}else if(m1.equals(m2))
     	{
-    	List<Match> best=new ArrayList<Match>(this.model.getBest(partenza, arrivo));
-    	this.txtResult.appendText("IL GRAFO DI LUNGHEZZA MASSIMA VALE: "+this.model.massimo+" ED E' COMPOSTO DA:\n");
-    	for(Match m:best)
+    		txtResult.appendText("stesso match!\n");
+    	}else
     	{
-    		this.txtResult.appendText(m.toString()+"\n");
-    	}
+    		List<Match> best=new ArrayList<Match>(this.model.getListaBest(m1, m2));
+    		txtResult.appendText("IL PERCORSO CON PESO MASSIMO HA PESO : "+this.model.pesoMax+" ED E' COMPOSTO DA:\n");
+    		for(Match m:best)
+    		{
+    			txtResult.appendText(m.toString()+"\n");
+    		}
     	}
     }
 
